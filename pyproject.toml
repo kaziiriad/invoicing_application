@@ -1,0 +1,14 @@
+[project]
+name = "jumatechs-assesment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dj-database-url>=3.0.1",
+    "django-cors-headers>=4.9.0",
+    "djangorestframework>=3.16.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "python-dotenv>=1.1.1",
+    "drf-yasg>=1.21.7",
+]
