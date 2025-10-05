@@ -38,7 +38,7 @@ class Command(BaseCommand):
             # Create or update the corresponding inventory record for the item.
             inventory, inv_created = Inventory.objects.update_or_create(
                 item=item,
-                defaults={'stock_quantity': stock}
+                defaults={'quantity_on_hand': stock}
             )
 
             if inv_created:

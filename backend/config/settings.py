@@ -50,13 +50,16 @@ EXTERNAL_APPS = [
     'corsheaders',
     'drf_yasg',
     'rest_framework_simplejwt',
-    'invoicing'
+    'rest_framework_simplejwt.token_blacklist',
+    'invoicing',
+    'users',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this line
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,7 +132,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# If you have static files in your apps
+STATICFILES_DIRS = [
+    # BASE_DIR / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -157,11 +168,16 @@ SIMPLE_JWT = {
 # CORS CONFIGURATION
 # For development, allow all origins.
 # For production, you should restrict this to your frontend's domain.
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# Or for production:
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://localhost:80",
+    "http://127.0.0.1",
+]
 
 
 # STATIC FILES CONFIGURATION
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # SWAGGER CONFIGURATION

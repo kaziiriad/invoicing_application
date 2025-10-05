@@ -40,6 +40,7 @@ urlpatterns = [
     # Project URLs
     path('admin/', admin.site.urls),
     path('api/', include('invoicing.api.urls')),
+    path('api/users/', include('users.api.urls')),
 
     # API Authentication URLs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
