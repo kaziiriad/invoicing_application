@@ -26,7 +26,12 @@ class Item(models.Model):
 class Inventory(models.Model):
     """Represents the stock level for a given Item."""
     item = models.OneToOneField(Item, on_delete=models.CASCADE, related_name='inventory')
-    stock_quantity = models.PositiveIntegerField(default=0)
+    quantity_on_hand = models.PositiveIntegerField(default=0)
+    quantity_allocated = models.PositiveIntegerField(default=0)
+
+    @property
+    def quantity_available(self):
+        return self.quantity_on_hand - self.quantity_allocated
 
     def __str__(self):
         return self.item.name
@@ -37,6 +42,7 @@ class Invoice(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('paid', 'Paid'),
+        ('cancelled', 'Cancelled'),
     ]
 
     reference_number = models.CharField(max_length=50, unique=True, blank=True)
@@ -129,4 +135,3 @@ class Transaction(models.Model):
     @property
     def amount_cash(self) -> float:
         return self.amount_cents / 100
-    

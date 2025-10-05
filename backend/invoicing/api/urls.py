@@ -1,5 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import InvoiceViewSet
 
+# Create a router and register our viewsets with it.
+router = DefaultRouter()
+router.register(r'invoices', InvoiceViewSet, basename='invoice')
+
+# The API URLs are now determined automatically by the router.
 urlpatterns = [
-    # API URLs will be added here in the next step.
+    path('', include(router.urls)),
 ]
