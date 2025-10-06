@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -184,18 +184,11 @@ SIMPLE_JWT = {
 }
 
 # CORS CONFIGURATION
-# For development, allow all origins.
-# For production, you should restrict this to your frontend's domain.
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
-# Or for production:
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost",
-    "http://localhost:80",
-    "http://127.0.0.1",
-    "http://localhost:8080",
-]
-
 CORS_ALLOW_CREDENTIALS = True
+# In production, CORS_ALLOWED_ORIGINS will be set via the render.yaml file.
+# For local development, we can default to the standard frontend port.
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:8080,http://127.0.0.1:8080').split(',')
+
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
