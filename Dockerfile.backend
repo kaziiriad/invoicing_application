@@ -13,7 +13,7 @@ WORKDIR /app
 
 # Set the python path to include the backend directory
 
-COPY pyproject.toml uv.lock /app/
+COPY pyproject.toml /app/
 RUN /usr/local/bin/uv sync
 
 COPY ./backend /app/backend/
