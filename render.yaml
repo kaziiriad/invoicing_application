@@ -12,7 +12,6 @@ services:
   - name: frontend
     type: web
     runtime: static
-    region: oregon # Static sites are global, but this helps Render co-locate services.
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
