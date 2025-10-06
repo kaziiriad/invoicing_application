@@ -1,5 +1,8 @@
 FROM python:3.12-slim-bookworm
 
+# Add this line near the top, after FROM
+ARG SECRET_KEY_BUILD
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
@@ -10,6 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
 
 WORKDIR /app
+
+# Use this SECRET_KEY during the build process
+ENV SECRET_KEY=${SECRET_KEY_BUILD}
 
 # Set the python path to include the backend directory
 
