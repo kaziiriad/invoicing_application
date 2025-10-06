@@ -9,6 +9,9 @@ class Item(models.Model):
     description = models.TextField()
     unit_price_cents = models.PositiveIntegerField()
 
+    class Meta:
+        ordering = ['name']
+
     @property
     def unit_price_cash(self) -> float:
         if self.unit_price_cents is None:

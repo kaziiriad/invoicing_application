@@ -1,0 +1,65 @@
+# Build stage
+FROM node:18-alpine as build
+
+# Install Python and build tools for native dependencies
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY frontend/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY frontend/ ./
+
+# Build the application for production
+RUN npm run build
+
+# Production stage - provide build artifacts with proper logging
+FROM alpine:latest
+
+# Install basic utilities for logging and debugging
+RUN apk add --no-cache bash curl
+
+WORKDIR /app
+
+# Copy built assets from build stage
+COPY --from=build /app/dist /app/frontend/dist
+
+# Create a script to copy files and provide logs
+RUN cat > /entrypoint.sh << 'EOF'
+#!/bin/bash
+echo "========================================="
+echo "Frontend Container Starting..."
+echo "========================================="
+echo "Build artifacts location: /app/frontend/dist"
+echo "Target volume location: /app/frontend/dist"
+echo ""
+
+# List the built files
+echo "Built files:"
+ls -la /app/frontend/dist/
+echo ""
+
+# Copy files to volume and keep container running
+echo "Frontend build artifacts ready for nginx mounting"
+echo "Container will remain running to provide volume data..."
+echo ""
+
+# Keep container running with periodic status updates
+while true; do
+    echo "[$(date)] Frontend container is running and providing build artifacts"
+    sleep 300  # Log every 5 minutes
+done
+EOF
+
+RUN chmod +x /entrypoint.sh
+
+# Health check to verify files are available
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD test -f /app/frontend/dist/index.html || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]

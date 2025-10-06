@@ -1,10 +1,11 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from ..models import Invoice
+from ..models import Invoice, Item
 from .serializers import (
     InvoiceCreateSerializer,
     InvoiceDetailSerializer,
@@ -12,13 +13,22 @@ from .serializers import (
     InvoicePaymentSerializer,
     InvoiceUpdateSerializer,
     InvoiceCancelSerializer,
+    ItemSerializer,
 )
+
+class StandardResultsSetPagination(PageNumberPagination):
+    """Standard pagination for all list views"""
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 class InvoiceViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for listing, creating, retrieving, and paying invoices.
     """
     queryset = Invoice.objects.all().order_by('-invoice_date')
+    
 
     def get_serializer_class(self):
         """
@@ -107,3 +117,13 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         
         response_serializer = InvoiceDetailSerializer(cancelled_invoice)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+
+class ItemViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A simple ViewSet for listing available items.
+    """
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = None

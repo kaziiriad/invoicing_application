@@ -1,25 +1,91 @@
-# Invoicing API Backend
+# InvoiceFlow - Complete Invoicing Management System
 
-This project implements a robust backend system for managing sales invoices and recording related transactions. It provides a RESTful API for creating, updating, viewing, paying, and cancelling invoices, with integrated inventory management and user authentication.
+This project implements a comprehensive full-stack invoicing management system consisting of a robust Django REST Framework backend and a modern React frontend. The system provides complete invoice lifecycle management, from creation to payment, with integrated inventory tracking and user authentication.
+
+## Project Structure
+
+```
+invoicing_application/
+├── backend/                 # Django REST Framework API
+│   ├── config/             # Django settings and main URLs
+│   ├── invoicing/          # Core invoicing app
+│   ├── users/              # User management and authentication
+│   └── manage.py
+├── frontend/               # React TypeScript frontend (fully implemented)
+├── docker-compose.yml      # Production deployment
+├── Dockerfile             # Backend container
+├── Frontend_Requirements.md # Comprehensive frontend specifications
+└── README.md              # This file
+```
 
 ## Features
 
-*   **Invoice Management:** Create, list, retrieve, update, pay, and cancel invoices.
-*   **Item & Inventory:** Manage product items and their stock levels (on-hand, allocated, available).
-*   **Transaction Tracking:** Automatically record 'Sale' transactions upon invoice creation and 'Payment' transactions upon invoice payment.
-*   **Stock Allocation:** Implement a stock holding mechanism where items are allocated upon invoice creation and deducted upon payment.
-*   **User Authentication:** Secure API endpoints using JWT (JSON Web Token) authentication, including user registration and token management.
-*   **API Documentation:** Auto-generated interactive API documentation using Swagger UI and ReDoc.
-*   **Containerized Deployment:** Production-ready setup using Docker and Docker Compose with Gunicorn and Nginx.
+### Backend API Features
+*   **Invoice Management:** Complete CRUD operations for invoices with status management (pending → paid/cancelled)
+*   **Item & Inventory:** Product catalog with real-time stock tracking (on-hand, allocated, available)
+*   **Transaction Tracking:** Automatic financial transaction recording for sales and payments
+*   **Stock Allocation:** Advanced stock reservation system preventing overselling
+*   **User Authentication:** JWT-based authentication with registration, login, logout, and token refresh
+*   **API Documentation:** Interactive Swagger UI and ReDoc documentation
+*   **Business Logic:** Automated calculations, validation, and status transitions
+
+### Frontend Features (React TypeScript)
+*   **User Authentication:** Login/Registration forms with JWT token management
+*   **Dashboard:** Overview of invoice statistics and recent activity
+*   **Invoice Management:** 
+    - Create invoices with customer details and line items
+    - List view with filtering, sorting, and pagination
+    - Detailed invoice view with transaction history
+    - Edit pending invoices
+    - One-click payment processing
+    - Invoice cancellation with stock release
+*   **Responsive Design:** Mobile-first approach with modern UI components
+*   **Real-time Calculations:** Dynamic totals and inventory updates
+*   **Error Handling:** Comprehensive validation and user feedback
+*   **Modern UI/UX:** Professional design with shadcn/ui components and Tailwind CSS
+*   **Theme Support:** Dark/light mode toggle with system preference detection
+*   **Data Visualization:** Interactive charts and analytics with Recharts
+
+### System Features
+*   **Containerized Deployment:** Production-ready Docker setup with Nginx reverse proxy
+*   **Database Support:** PostgreSQL for production, SQLite for development
+*   **CORS Configuration:** Ready for frontend integration
+*   **Security:** JWT authentication, input validation, and secure headers
 
 ## Technologies Used
 
-*   **Backend:** Python 3.12, Django 5.x, Django REST Framework 3.x
-*   **Database:** PostgreSQL (recommended for production), SQLite (for development)
-*   **Authentication:** `djangorestframework-simplejwt`
-*   **API Documentation:** `drf-yasg`
-*   **Package Management:** `uv`
-*   **Deployment:** Docker, Docker Compose, Gunicorn, Nginx
+### Backend Stack
+*   **Framework:** Python 3.12, Django 5.2+, Django REST Framework 3.14+
+*   **Database:** PostgreSQL (production), SQLite (development)
+*   **Authentication:** `djangorestframework-simplejwt` 5.3+ (JWT tokens with blacklisting)
+*   **API Documentation:** `drf-yasg` 1.21+ (Swagger UI & ReDoc)
+*   **Package Management:** `uv` (fast Python package manager)
+*   **Web Server:** Gunicorn 21+ (production), Django dev server (development)
+*   **Additional Libraries:** `django-cors-headers`, `python-dotenv`, `dj-database-url`, `psycopg[binary]`, `whitenoise`
+
+### Frontend Stack
+*   **Framework:** React 18.3.1 with TypeScript 5.8.3
+*   **Build Tool:** Vite 5.4.19 with React SWC plugin
+*   **UI Framework:** shadcn/ui with Radix UI primitives
+*   **Styling:** Tailwind CSS 3.4.17 with custom design tokens & animations
+*   **HTTP Client:** Axios 1.12.2 with TanStack React Query 5.83.0
+*   **State Management:** React Context API for authentication
+*   **Form Handling:** React Hook Form 7.61.1 with Zod 3.25.76 validation
+*   **Routing:** React Router DOM 6.30.1
+*   **Icons:** Lucide React 0.462.0 (462 icons)
+*   **Date Handling:** date-fns 3.6.0 with React Day Picker 8.10.1
+*   **Charts:** Recharts 2.15.4 for dashboard analytics
+*   **Notifications:** Sonner 1.7.4 for toast messages
+*   **Theme System:** next-themes 0.3.0 for dark/light mode
+*   **Carousel:** Embla Carousel React 8.6.0
+*   **Utilities:** clsx, class-variance-authority, tailwind-merge
+
+### Deployment & DevOps
+*   **Containerization:** Docker & Docker Compose
+*   **Web Server:** Nginx (reverse proxy)
+*   **Application Server:** Gunicorn
+*   **Static Files:** WhiteNoise middleware
+*   **Development:** Hot reload for both backend and frontend
 
 ## Entity-Relationship Diagram
 
@@ -81,9 +147,9 @@ erDiagram
     }
 ```
 
-## Key Architectural & Feature Decisions
+## Architecture & Design Decisions
 
-This section explains the rationale behind some of the core design choices made in this project.
+This section explains the rationale behind the core design choices and architectural patterns used in this full-stack application.
 
 ### 1. Granular Data Models (`Item`, `Inventory`, `InvoiceItem`, `Transaction`)
 
@@ -139,7 +205,8 @@ Follow these steps to get the project up and running on your local machine for d
 ### Prerequisites
 
 *   Python 3.12+
-*   `uv` (recommended package manager)
+*   Node.js 18+ and npm (for frontend)
+*   `uv` (recommended package manager for backend)
 *   Docker and Docker Compose (for production-like local testing)
 
 ### 1. Clone the Repository
@@ -197,13 +264,92 @@ Populate the database with some sample items and inventory:
 uv run -- python backend/manage.py seed_inventory
 ```
 
-### 7. Run the Development Server
+### 7. Run the Backend Development Server
 
 ```bash
-uv run -- python backend/manage.py runserver
+uv run -- python backend/manage.py runserver 0.0.0.0:8000
 ```
 
 The API will be accessible at `http://127.0.0.1:8000/api/`.
+
+## Frontend Setup
+
+The frontend is a **fully implemented React TypeScript application** built with Vite and modern UI libraries including shadcn/ui, Tailwind CSS, and React Query.
+
+#### Technology Stack
+- **Framework:** React 18 with TypeScript
+- **Build Tool:** Vite
+- **UI Components:** shadcn/ui with Radix UI
+- **Styling:** Tailwind CSS
+- **HTTP Client:** Axios with React Query
+- **State Management:** React Context API
+- **Form Handling:** React Hook Form with Zod validation
+- **Routing:** React Router v6
+- **Icons:** Lucide React
+
+#### Features Implemented
+✅ **Authentication:** Login/logout with JWT token management  
+✅ **Dashboard:** Statistics overview and recent invoices  
+✅ **Invoice Management:** Create, view, edit, pay, and cancel invoices  
+✅ **Responsive Design:** Mobile-first with dark/light theme support  
+✅ **Real-time Updates:** React Query for optimistic updates  
+✅ **Type Safety:** Full TypeScript integration with API types
+
+#### Setup Instructions
+
+1.  **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or bun install (if you prefer bun)
+    ```
+
+3.  **Environment Variables:**
+    The `.env` file is already configured with:
+    ```
+    VITE_API_URL=http://localhost:8000/api
+    ```
+
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+    The application will be available at `http://localhost:8080`. You can access the registration page at `http://localhost:8080/register`.
+
+#### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production  
+npm run build:dev    # Build in development mode
+npm run lint         # Run ESLint
+npm run preview      # Preview production build
+```
+
+## Running the Full Application (Backend + Frontend)
+
+To run both the backend and frontend simultaneously for local development:
+
+1.  **Start the Backend Server** (in a separate terminal):
+    ```bash
+    cd backend
+    uv run -- python manage.py runserver 0.0.0.0:8000
+    ```
+
+2.  **Start the Frontend Development Server** (in another separate terminal):
+    ```bash
+    cd frontend
+    npm run dev
+    ```
+
+Once both servers are running:
+- **Frontend Application:** `http://localhost:8080` (React app)
+- **Backend API:** `http://localhost:8000/api/` (Django REST API)
+- **API Documentation:** `http://localhost:8000/swagger/` (Swagger UI)
+
 
 ## API Endpoints
 
@@ -242,43 +388,115 @@ Access the interactive API documentation at:
 *   **Swagger UI:** `http://127.0.0.1:8000/swagger/`
 *   **ReDoc:** `http://127.0.0.1:8000/redoc/`
 
-## Deployment (Production with Docker Compose)
+## Docker Deployment
 
-For a production environment, it's recommended to use Docker Compose to run your application with Gunicorn and Nginx.
+### Quick Start with Docker (Recommended)
 
-### Prerequisites
-
-*   Docker and Docker Compose installed.
-
-### 1. Environment Variables
-
-Ensure your `backend/.env` file is configured for production:
-
-```
-SECRET_KEY=your_production_secret_key_here
-DEBUG=False
-ALLOWED_HOSTS=your_domain.com,www.your_domain.com
-DATABASE_URL=postgres://user:password@db:5432/dbname # Replace with your PostgreSQL connection string
-```
-
-### 2. Build and Run
-
-From the project root directory, execute:
+Use the provided helper script for easy Docker management:
 
 ```bash
-docker-compose up --build -d
+# Make script executable
+chmod +x docker-dev.sh
+
+# Start all services (backend + frontend + database)
+./docker-dev.sh start
+
+# View status
+./docker-dev.sh status
+
+# View logs
+./docker-dev.sh logs
+
+# Stop services
+./docker-dev.sh stop
 ```
 
-*   `--build`: Rebuilds the Docker images (necessary after code changes).
-*   `-d`: Runs the containers in detached mode (in the background).
+Your complete application will be available at:
+- **🌐 Full Application:** `http://localhost:80` (React frontend)
+- **🔧 Backend API:** `http://localhost:80/api/`
+- **📚 API Documentation:** `http://localhost:80/swagger/`
+- **🗄️ Database:** `localhost:5432`
 
-### 3. Access
+### Docker Architecture
 
-Your application will be accessible on port 80 of your host machine.
+The containerized setup includes:
 
-*   **API:** `http://your_host_ip_or_domain/api/`
-*   **Swagger UI:** `http://your_host_ip_or_domain/swagger/`
-*   **ReDoc:** `http://your_host_ip_or_domain/redoc/`
+1. **Frontend Container**: React app built with Vite and served via nginx
+2. **Backend Container**: Django REST API with Gunicorn
+3. **Nginx Proxy**: Routes frontend and API requests, serves static files
+4. **PostgreSQL Database**: Production-ready database
+
+### Docker Helper Script Commands
+
+```bash
+./docker-dev.sh start          # Build and start all services
+./docker-dev.sh stop           # Stop all services  
+./docker-dev.sh restart        # Restart services
+./docker-dev.sh logs [service] # View logs
+./docker-dev.sh status         # Show service status
+./docker-dev.sh cleanup        # Clean up Docker resources
+
+# Run commands in containers
+./docker-dev.sh backend 'python manage.py migrate'
+./docker-dev.sh backend 'python manage.py createsuperuser'
+./docker-dev.sh frontend 'npm run build'
+```
+
+### Manual Docker Compose
+
+If you prefer to use docker-compose directly:
+
+```bash
+# Start services
+docker-compose up --build -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild and restart
+docker-compose up --build --force-recreate
+```
+
+### Production Deployment
+
+For production deployment:
+
+1. **Environment Variables**: Update `backend/.env` for production:
+   ```
+   SECRET_KEY=your_production_secret_key_here
+   DEBUG=False
+   ALLOWED_HOSTS=your_domain.com,www.your_domain.com
+   DATABASE_URL=postgresql://user:password@postgres:5432/dbname
+   ```
+
+2. **SSL/HTTPS**: Add SSL certificates to nginx configuration
+
+3. **Domain Setup**: Update nginx.conf with your domain
+
+4. **Database**: Use managed PostgreSQL service or secure the container
+
+5. **Deploy**: 
+   ```bash
+   ./docker-dev.sh start
+   ```
+
+### Container Services
+
+| Service | Container | Port | Purpose |
+|---------|-----------|------|---------|
+| Frontend | `react_frontend` | - | React app build artifacts |
+| Backend | `django_backend` | 8000 | Django REST API |
+| Nginx | `nginx_proxy` | 80 | Reverse proxy & static files |
+| Database | `postgres_db` | 5432 | PostgreSQL database |
+
+### Volumes
+
+- `frontend_volume`: Stores built React app files
+- `static_volume`: Django static files (admin, DRF UI)
+- `postgres_volume`: Database persistence
 
 ---
 
