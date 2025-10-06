@@ -2,7 +2,7 @@
 # Defines the services for the InvoiceFlow application on Render.
 
 databases:
-  - name: database # Name used for referencing
+  - name: database
     plan: free
     ipAllowList: [] # Allow connections from anywhere
 
@@ -32,19 +32,18 @@ services:
         fromService:
           type: web
           name: frontend
-          property: url
+          property: host # NOTE: Manually add https:// in Render dashboard
       - key: DJANGO_ALLOWED_HOSTS
         fromService:
           type: web
           name: backend
-          property: host
+          property: host # NOTE: Manually add frontend host in Render dashboard
 
   # 2. Frontend Service (React Static Site)
   - name: frontend
     type: web
     plan: free
     runtime: static
-    region: oregon
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
@@ -53,4 +52,4 @@ services:
         fromService:
           type: web
           name: backend
-          property: url
+          property: host # NOTE: Manually add https:// and /api in Render dashboard
