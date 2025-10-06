@@ -25,6 +25,7 @@ export interface Item {
   description: string;
   unit_price_cents: number;
   unit_price_cash: number;
+  quantity_available: number;
 }
 
 export interface InvoiceLineItem {
@@ -61,6 +62,7 @@ export interface Invoice {
   total_amount_cents: number;
   is_overdue: boolean;
   items_count?: number;
+  payment_date?: string;
   items?: InvoiceLineItem[];
   transactions?: Transaction[];
 }

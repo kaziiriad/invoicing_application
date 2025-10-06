@@ -53,6 +53,7 @@ const Items = () => {
                     <TableHead>Name</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead className="text-right">Unit Price (Cash)</TableHead>
+                    <TableHead className="text-right">Available Quantity</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -63,6 +64,7 @@ const Items = () => {
                       <TableCell className="text-right font-semibold">
                         {formatCurrency(item.unit_price_cash)}
                       </TableCell>
+                      <TableCell className="text-right">{item.quantity_available}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

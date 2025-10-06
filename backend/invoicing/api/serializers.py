@@ -8,10 +8,18 @@ from ..services import InvoiceService
 
 class ItemSerializer(serializers.ModelSerializer):
     unit_price_cash = serializers.FloatField(read_only=True)
+    quantity_available = serializers.IntegerField(source='inventory.quantity_available', read_only=True)
     
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'unit_price_cents', 'unit_price_cash']
+        fields = [
+            'id', 
+            'name', 
+            'description', 
+            'unit_price_cents', 
+            'unit_price_cash', 
+            'quantity_available'
+        ]
 
 class InventorySerializer(serializers.ModelSerializer):
     item_name = serializers.CharField(source='item.name', read_only=True)
@@ -149,18 +157,28 @@ class InvoiceListSerializer(serializers.ModelSerializer):
     total_amount = serializers.FloatField(source='total_amount_cash', read_only=True)
     is_overdue = serializers.BooleanField(read_only=True)
     items_count = serializers.SerializerMethodField()
-    
+    payment_date = serializers.SerializerMethodField()
+
     class Meta:
         model = Invoice
         fields = [
             'id', 'reference_number', 'customer_name', 'customer_email',
-            'invoice_date', 'due_date', 'status', 'total_amount', 
-            'is_overdue', 'items_count'
+            'invoice_date', 'due_date', 'status', 'total_amount',
+            'is_overdue', 'items_count', 'payment_date'
         ]
-        read_only_fields = ['id', 'reference_number', 'invoice_date', 'total_amount', 'is_overdue']
-    
+        read_only_fields = ['id', 'reference_number', 'invoice_date', 'total_amount', 'is_overdue', 'payment_date']
+
     def get_items_count(self, obj):
-        return obj.invoiceitem_set.count()
+        # This is efficient thanks to prefetch_related('invoiceitem_set') in the view
+        return len(obj.invoiceitem_set.all())
+
+    def get_payment_date(self, obj):
+        if obj.status == 'paid':
+            # This is efficient thanks to prefetch_related('transactions') in the view
+            payment_transaction = next((t for t in reversed(obj.transactions.all()) if t.transaction_type == 'payment'), None)
+            if payment_transaction:
+                return payment_transaction.timestamp
+        return None
 
 class InvoiceDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for invoice retrieval"""

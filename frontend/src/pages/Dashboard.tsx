@@ -137,7 +137,15 @@ const Dashboard = () => {
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-foreground">{formatCurrency(invoice.total_amount)}</p>
-                      <p className="text-sm text-muted-foreground">Due: {new Date(invoice.due_date).toLocaleDateString()}</p>
+                      {invoice.status === 'paid' && invoice.payment_date ? (
+                        <p className="text-sm text-muted-foreground">
+                          Paid: {new Date(invoice.payment_date).toLocaleDateString()}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Due: {new Date(invoice.due_date).toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
                   </Link>
                 ))}

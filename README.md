@@ -11,11 +11,14 @@ invoicing_application/
 │   ├── invoicing/          # Core invoicing app
 │   ├── users/              # User management and authentication
 │   └── manage.py
-├── frontend/               # React TypeScript frontend (fully implemented)
-├── docker-compose.yml      # Production deployment
-├── Dockerfile             # Backend container
-├── Frontend_Requirements.md # Comprehensive frontend specifications
-└── README.md              # This file
+├── frontend/               # React TypeScript frontend
+├── docker-compose.yml      # Docker services definition
+├── Dockerfile.backend      # Backend Dockerfile
+├── Dockerfile.frontend     # Frontend Dockerfile
+├── docker-dev.sh           # Helper script for Docker
+├── nginx.conf              # Nginx configuration
+├── pyproject.toml          # Backend dependencies
+└── README.md               # This file
 ```
 
 ## Features
@@ -359,7 +362,6 @@ All API endpoints are prefixed with `/api/`.
 
 *   **`POST /api/users/register/`**: Register a new user.
     *   **Request Body:** `{"username": "...", "email": "...", "password": "...", "password2": "..."}`
-    *   **Response:** User data, `access` and `refresh` JWT tokens.
 *   **`POST /api/token/`**: Obtain JWT access and refresh tokens.
     *   **Request Body:** `{"username": "...", "password": "..."}`
     *   **Response:** `access` and `refresh` JWT tokens.
@@ -381,6 +383,156 @@ All API endpoints are prefixed with `/api/`.
 *   **`POST /api/invoices/{id}/pay/`**: Mark a pending invoice as paid.
     *   **Request Body (Optional):** `{"notes": "..."}`
 *   **`POST /api/invoices/{id}/cancel/`**: Cancel a pending invoice and release allocated stock.
+
+### Items (Requires Authentication)
+
+*   **`GET /api/items/`**: List all available items and their stock levels.
+
+### API Documentation
+
+Access the interactive API documentation at:
+*   **Swagger UI:** `http://127.0.0.1:8000/swagger/`
+*   **ReDoc:** `http://127.0.0.1:8000/redoc/`
+
+## Docker Deployment
+
+### Quick Start with Docker (Recommended)
+
+Use the provided helper script for easy Docker management:
+
+```bash
+# Make script executable
+chmod +x docker-dev.sh
+
+# Start all services (backend + frontend + database)
+./docker-dev.sh start
+
+# View status
+./docker-dev.sh status
+
+# View logs
+./docker-dev.sh logs
+
+# Stop services
+./docker-dev.sh stop
+```
+
+Your complete application will be available at:
+- **🌐 Full Application:** `http://localhost:80` (React frontend)
+- **🔧 Backend API:** `http://localhost:80/api/`
+- **📚 API Documentation:** `http://localhost:80/swagger/`
+- **🗄️ Database:** `localhost:5432`
+
+### Docker Architecture
+
+The containerized setup includes:
+
+1. **Frontend Container**: React app built with Vite and served via nginx
+2. **Backend Container**: Django REST API with Gunicorn
+3. **Nginx Proxy**: Routes frontend and API requests, serves static files
+4. **PostgreSQL Database**: Production-ready database
+
+### Docker Helper Script Commands
+
+```bash
+./docker-dev.sh start          # Build and start all services
+./docker-dev.sh stop           # Stop all services  
+./docker-dev.sh restart        # Restart services
+./docker-dev.sh logs [service] # View logs
+./docker-dev.sh status         # Show service status
+./docker-dev.sh cleanup        # Clean up Docker resources
+
+# Run commands in containers
+./docker-dev.sh backend 'python manage.py migrate'
+./docker-dev.sh backend 'python manage.py createsuperuser'
+./docker-dev.sh frontend 'npm run build'
+```
+
+### Manual Docker Compose
+
+If you prefer to use docker-compose directly:
+
+```bash
+# Start services
+docker-compose up --build -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild and restart
+docker-compose up --build --force-recreate
+```
+
+### Production Deployment
+
+For production deployment:
+
+1. **Environment Variables**: Update `backend/.env` for production:
+   ```
+   SECRET_KEY=your_production_secret_key_here
+   DEBUG=False
+   ALLOWED_HOSTS=your_domain.com,www.your_domain.com
+   DATABASE_URL=postgresql://user:password@postgres:5432/dbname
+   ```
+
+2. **SSL/HTTPS**: Add SSL certificates to nginx configuration
+
+3. **Domain Setup**: Update nginx.conf with your domain
+
+4. **Database**: Use managed PostgreSQL service or secure the container
+
+5. **Deploy**: 
+   ```bash
+   ./docker-dev.sh start
+   ```
+
+### Container Services
+
+| Service | Container | Port | Purpose |
+|---------|-----------|------|---------|
+| Frontend | `react_frontend` | - | React app build artifacts |
+| Backend | `django_backend` | 8000 | Django REST API |
+| Nginx | `nginx_proxy` | 80 | Reverse proxy & static files |
+| Database | `postgres_db` | 5432 | PostgreSQL database |
+
+### Volumes
+
+- `frontend_volume`: Stores built React app files
+- `static_volume`: Django static files (admin, DRF UI)
+- `postgres_volume`: Database persistence
+
+---
+
+This `README.md` provides a comprehensive overview, setup instructions, API details, and justifications for key design decisions.
+"username": "...", "email": "...", "password": "...", "password2": "..."}`
+*   **`POST /api/token/`**: Obtain JWT access and refresh tokens.
+    *   **Request Body:** `{"username": "...", "password": "..."}`
+    *   **Response:** `access` and `refresh` JWT tokens.
+*   **`POST /api/token/refresh/`**: Refresh an expired access token using a refresh token.
+    *   **Request Body:** `{"refresh": "..."}`
+    *   **Response:** New `access` token.
+*   **`POST /api/users/logout/`**: Blacklist a refresh token to log out.
+    *   **Request Body:** `{"refresh": "..."}`
+    *   **Response:** `205 Reset Content` on success.
+
+### Invoices (Requires Authentication)
+
+*   **`GET /api/invoices/`**: List all invoices.
+*   **`POST /api/invoices/`**: Create a new invoice.
+    *   **Request Body:** `{"customer_name": "...", "due_date": "YYYY-MM-DD", "items": [{"item": <item_id>, "quantity": <int>}]}`
+*   **`GET /api/invoices/{id}/`**: Retrieve details of a specific invoice.
+*   **`PATCH /api/invoices/{id}/`**: Partially update a pending invoice (e.g., customer details, due date).
+*   **`PUT /api/invoices/{id}/`**: Fully update a pending invoice (e.g., customer details, due date).
+*   **`POST /api/invoices/{id}/pay/`**: Mark a pending invoice as paid.
+    *   **Request Body (Optional):** `{"notes": "..."}`
+*   **`POST /api/invoices/{id}/cancel/`**: Cancel a pending invoice and release allocated stock.
+
+### Items (Requires Authentication)
+
+*   **`GET /api/items/`**: List all available items and their stock levels.
 
 ### API Documentation
 

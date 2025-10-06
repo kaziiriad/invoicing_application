@@ -28,6 +28,14 @@ class InvoiceViewSet(viewsets.ModelViewSet):
     A ViewSet for listing, creating, retrieving, and paying invoices.
     """
     queryset = Invoice.objects.all().order_by('-invoice_date')
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == 'list':
+            # Prefetch related data for list view to optimize serializer fields
+            return queryset.prefetch_related('invoiceitem_set', 'transactions')
+        return queryset
     
 
     def get_serializer_class(self):
@@ -123,7 +131,7 @@ class ItemViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for listing available items.
     """
-    queryset = Item.objects.all()
+    queryset = Item.objects.select_related('inventory').all()
     serializer_class = ItemSerializer
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = None
