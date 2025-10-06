@@ -19,7 +19,7 @@ services:
     region: oregon # You can choose a region closer to you
     rootDir: backend
     buildCommand: "uv sync && python manage.py migrate"
-    startCommand: "uv run gunicorn config.wsgi:application"
+    startCommand: "gunicorn config.wsgi:application"
     healthCheckPath: /api/token/
     envVars:
       - key: PYTHON_VERSION
@@ -35,7 +35,7 @@ services:
         value: 4 # Recommended by Render for Gunicorn
       - key: CORS_ALLOWED_ORIGINS
         fromService:
-          type: static
+          type: static_site
           name: frontend
           property: url
       - key: DJANGO_ALLOWED_HOSTS
@@ -46,7 +46,7 @@ services:
 
   # 3. Frontend Service (React Static Site)
   - name: frontend
-    type: static
+    type: static_site
     plan: free
     region: oregon # Use the same region as the backend
     rootDir: frontend
