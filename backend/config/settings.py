@@ -51,8 +51,8 @@ EXTERNAL_APPS = [
     'drf_yasg',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'invoicing',
-    'users',
+    'backend.invoicing',
+    'backend.users',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS
@@ -69,7 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'backend.config.urls'
 
 TEMPLATES = [
     {
