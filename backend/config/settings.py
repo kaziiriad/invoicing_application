@@ -193,7 +193,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:80",
     "http://127.0.0.1",
     "http://localhost:8080",
-    "https://invoicing-application-lilac.vercel.app/"
+    "https://invoicing-application-lilac.vercel.app"
 
 ]
 
