@@ -1,5 +1,6 @@
 # render.yaml
-# Defines the services for the InvoiceFlow application on Render.
+# Defines the database and frontend services for the InvoiceFlow application.
+# The backend service should be deployed manually as a free Web Service.
 
 databases:
   - name: database
@@ -7,49 +8,13 @@ databases:
     ipAllowList: [] # Allow connections from anywhere
 
 services:
-  # 1. Backend Service (Django + Gunicorn)
-  - name: backend
-    type: web
-    plan: free
-    env: python
-    region: oregon
-    rootDir: backend
-    buildCommand: "uv sync && python manage.py migrate"
-    startCommand: "gunicorn config.wsgi:application"
-    healthCheckPath: /api/token/
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.12
-      - key: DATABASE_URL
-        fromDatabase:
-          name: database
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: WEB_CONCURRENCY
-        value: 4
-      - key: CORS_ALLOWED_ORIGINS
-        fromService:
-          type: web
-          name: frontend
-          property: host # NOTE: Manually add https:// in Render dashboard
-      - key: DJANGO_ALLOWED_HOSTS
-        fromService:
-          type: web
-          name: backend
-          property: host # NOTE: Manually add frontend host in Render dashboard
-
-  # 2. Frontend Service (React Static Site)
+  # Frontend Service (React Static Site)
   - name: frontend
     type: web
-    plan: free
     runtime: static
+    region: oregon # Static sites are global, but this helps Render co-locate services.
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: backend
-          property: host # NOTE: Manually add https:// and /api in Render dashboard
+    # IMPORTANT: The VITE_API_URL will need to be set manually in the
+    # Render dashboard after the backend service is deployed.
